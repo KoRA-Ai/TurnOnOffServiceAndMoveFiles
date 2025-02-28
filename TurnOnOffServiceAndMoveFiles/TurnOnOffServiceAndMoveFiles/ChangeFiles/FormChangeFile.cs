@@ -21,8 +21,13 @@ namespace TurnOnOffServiceAndMoveFiles.ChangeFiles
         public FormChangeFile()
         {
             InitializeComponent();
-            SetComboBox(true, true);
-            SetComboBox(false, true);
+            if (!File.Exists(configFilePath))
+            {
+                using (FileStream fs = File.Create(configFilePath)) { }
+            }
+
+            SetComboBox(true);
+            SetComboBox(false);
 
             btnSourcePath.Click += (s, e) => GetForderPath(true);
             btnTargetPath.Click += (s, e) => GetForderPath(false);
@@ -32,23 +37,38 @@ namespace TurnOnOffServiceAndMoveFiles.ChangeFiles
             this.FormClosed += (s, e) => { tbLog.Clear(); };
         }
 
+        private bool CheckDirectory(string dirPath)
+        {
+            if (string.IsNullOrWhiteSpace(dirPath))
+            {
+                tbLog.AppendText("【來源路徑/目標路徑不可為空】" + "\n");
+                return false;
+            }
+            if (!Directory.Exists(dirPath))
+            {
+                tbLog.AppendText("【來源路徑/目標路徑不存在】" + "\n");
+                return false;
+            }
+            return true;
+        }
+
         private void DoMoveFiles()
         {
             try
             {
                 string from = cbSourcePath.Text;
                 string to = cbTargetPath.Text;
-                if (string.IsNullOrWhiteSpace(from) || string.IsNullOrWhiteSpace(to))
+                if (from == to)
                 {
-                    tbLog.AppendText("【來源路徑/目標路徑不可為空】" + "\n");
+                    tbLog.AppendText($"【來源路徑不可跟目標路徑相同】" + "\n");
                     return;
                 }
-                if (!Directory.Exists(from) || !Directory.Exists(to))
+                if (CheckDirectory(from) && CheckDirectory(to))
                 {
-                    tbLog.AppendText("【來源路徑/目標路徑不存在】" + "\n");
-                    return;
+                    int fileCount = 0;
+                    MoveFile(from, to, ref fileCount);
+                    tbLog.AppendText($"【換檔案完成-移動了{fileCount}個檔案】" + "\n");
                 }
-                MoveFile(from, to);
             }
             catch (Exception e)
             {
@@ -56,12 +76,13 @@ namespace TurnOnOffServiceAndMoveFiles.ChangeFiles
             }
         }
 
-        private void MoveFile(string fromDir, string toDir)
+        private void MoveFile(string fromDir, string toDir, ref int fileCount)
         {
             if (!Directory.Exists(toDir))
                 Directory.CreateDirectory(toDir);
 
             string[] files = Directory.GetFiles(fromDir);
+
             foreach (string file in files)
             {
                 string name = Path.GetFileName(file);
@@ -72,13 +93,14 @@ namespace TurnOnOffServiceAndMoveFiles.ChangeFiles
                     File.Delete(dest);
                 }
                 File.Copy(file, dest);
+                fileCount++;
             }
             string[] folders = Directory.GetDirectories(fromDir);
             foreach (string folder in folders)
             {
                 string name = Path.GetFileName(folder);
                 string dest = Path.Combine(toDir, name);
-                MoveFile(folder, dest);
+                MoveFile(folder, dest, ref fileCount);
             }
         }
 
@@ -106,28 +128,28 @@ namespace TurnOnOffServiceAndMoveFiles.ChangeFiles
             SetComboBox(isSelectSource);
         }
 
-        private void SetComboBox(bool isSelectSource, bool isForUpdate = false)
+        private void SetComboBox(bool isSelectSource)
         {
             try
             {
                 if (File.Exists(configFilePath))
                 {
-                    using (System.IO.StreamReader reader = new System.IO.StreamReader(configFilePath))
+                    List<string> lines = new List<string>();
+                    lines.AddRange(File.ReadAllLines(configFilePath));
+                    while (lines.Count() < 2)
                     {
-                        if (isSelectSource)
-                        {
-                            cbSourcePath.Items.Clear();
-                            cbSourcePath.Items.AddRange(reader.ReadToEnd().Split(';')[0].Split(',').ToArray());
-                        }
-                        else
-                        {
-                            cbTargetPath.Items.Clear();
-                            cbTargetPath.Items.AddRange(reader.ReadToEnd().Split(';')[1].Split(',').ToArray());
-                        }
+                        lines.Add("");//補足兩行，第一行放來源路徑，第二行放目標路徑
                     }
-                    if (!isForUpdate)
+
+                    if (isSelectSource)
                     {
-                        tbLog.AppendText("【儲存設定成功】" + "\n");
+                        cbSourcePath.Items.Clear();
+                        cbSourcePath.Items.AddRange(lines[0].Trim().Split(',').ToArray());
+                    }
+                    else
+                    {
+                        cbTargetPath.Items.Clear();
+                        cbTargetPath.Items.AddRange(lines[1].Trim().Split(',').ToArray());
                     }
                 }
             }
@@ -141,103 +163,48 @@ namespace TurnOnOffServiceAndMoveFiles.ChangeFiles
         {
             try
             {
-                bool isFirstWrite = false;
                 if (!File.Exists(configFilePath))
                 {
-                    isFirstWrite = true;
+                    using (FileStream fs = File.Create(configFilePath)) { }
+                }
+
+                List<string> lines = new List<string>();
+                lines.AddRange(File.ReadAllLines(configFilePath));
+                while (lines.Count() < 2)
+                {
+                    lines.Add("");//補足兩行，第一行放來源路徑，第二行放目標路徑
+                }
+                if (isSelectSource)
+                {
+                    if (!CheckDirectory(cbSourcePath.Text)) return;
+                    //讀取已儲存的設置，若現在要存的路徑已存在，則不重複增加
+                    foreach (string data in lines[0].Split(',').ToArray())
+                    {
+                        if (data == cbSourcePath.Text) return;
+                    }
+                    //寫入路徑
+                    lines[0] = (string.IsNullOrWhiteSpace(lines[0]) ? "" : lines[0] + ",") + cbSourcePath.Text;
                 }
                 else
                 {
+                    if (!CheckDirectory(cbTargetPath.Text)) return;
+
                     //讀取已儲存的設置，若現在要存的路徑已存在，則不重複增加
-                    using (System.IO.StreamReader reader = new System.IO.StreamReader(configFilePath))
+                    foreach (string data in lines[1].Split(',').ToArray())
                     {
-                        string sourcePaths = "";
-                        string targetPaths = "";
-                        var alltext = reader.ReadToEnd().Split(';').ToArray();
-                        for (int i = 0; i < alltext.Count(); i++)
-                        {
-                            if (i == 0)
-                            {
-                                sourcePaths = alltext[0];
-                            }
-                            else if (i == 1)
-                            {
-                                targetPaths = alltext[1];
-                            }
-                        }
-
-                        if (isSelectSource && !string.IsNullOrWhiteSpace(sourcePaths))
-                        {
-                            foreach (string data in sourcePaths.Split(',').ToArray())
-                            {
-                                if (data == cbSourcePath.Text) return;
-                            }
-                        }
-                        else if (!isSelectSource && !string.IsNullOrWhiteSpace(sourcePaths))
-                        {
-                            foreach (string data in targetPaths.Split(',').ToArray())
-                            {
-                                if (data == cbTargetPath.Text) return;
-                            }
-                        }
+                        if (data == cbTargetPath.Text) return;
                     }
+                    //寫入路徑
+                    lines[1] = (string.IsNullOrWhiteSpace(lines[1]) ? "" : lines[1] + ",") + cbTargetPath.Text;
                 }
 
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(configFilePath, true))
-                {
-                    file.Write((isFirstWrite ? "" : ",") + (isSelectSource ? cbSourcePath.Text : cbTargetPath.Text));
-
-                    file.Close();
-                }
+                File.WriteAllLines(configFilePath, lines);
+                tbLog.AppendText("【儲存設定成功】" + "\n");
             }
             catch (Exception e)
             {
                 tbLog.AppendText("【儲存設定失敗】" + e.ToString() + "\n");
             }
         }
-
-        #region useless XML
-
-        private void WriteXML(bool isSelectSource)
-        {
-            string configFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"SavingConfig.xml");
-
-            XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Indent = true;
-            using (XmlWriter writer = XmlWriter.Create(configFilePath, settings))
-            {
-                if (!File.Exists(configFilePath))
-                {
-                    writer.WriteStartDocument();
-                    writer.WriteComment("This file is generated by the program.");
-
-                    //writer.WriteStartElement("Paths");
-                }
-
-                if (isSelectSource)
-                {
-                    WriteSavingData(writer, true, cbSourcePath.Text);
-                    //WriteSavingData(writer, true, tbSourcePath.Text);
-                }
-                else
-                {
-                    WriteSavingData(writer, false, cbTargetPath.Text);
-                    //WriteSavingData(writer, false, tbTargetPath.Text);
-                }
-                //writer.WriteEndElement();
-                writer.WriteEndDocument();
-                writer.Flush();
-            }
-        }
-
-        private void WriteSavingData(XmlWriter writer, bool isSelectSource, string fullPath)
-        {
-            writer.WriteStartElement("Path");
-            writer.WriteAttributeString("PathType", (isSelectSource ? "SourcePath" : "TargetPath"));
-            writer.WriteElementString("FullPath", fullPath);
-            writer.WriteEndElement();
-        }
-
-        #endregion  useless XML
     }
 }

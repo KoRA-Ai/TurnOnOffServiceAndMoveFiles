@@ -17,7 +17,6 @@ namespace TurnOnOffServiceAndMoveFiles
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new FormChangeFile());
             Application.Run(new FormMain());
         }
     }
