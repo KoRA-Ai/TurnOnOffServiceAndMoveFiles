@@ -1,4 +1,4 @@
-﻿namespace TurnOnOffService
+﻿namespace OpenCloseService
 {
     partial class FormService
     {

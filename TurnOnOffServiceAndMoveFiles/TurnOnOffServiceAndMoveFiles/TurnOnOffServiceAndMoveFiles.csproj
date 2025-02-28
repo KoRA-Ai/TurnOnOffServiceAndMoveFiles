@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F7DA6339-2188-4FEF-A586-FC9664D5B84D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>TurnOnOffService</RootNamespace>
-    <AssemblyName>TurnOnOffService</AssemblyName>
+    <RootNamespace>TurnOnOffServiceAndMoveFiles</RootNamespace>
+    <AssemblyName>TurnOnOffServiceAndMoveFiles</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>TurnOnOffService.Program</StartupObject>
+    <StartupObject>TurnOnOffServiceAndMoveFiles.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -62,23 +62,23 @@
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="TurnOnOffService\FormService.cs">
+    <Compile Include="OpenCloseService\FormService.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TurnOnOffService\FormService.Designer.cs">
+    <Compile Include="OpenCloseService\FormService.Designer.cs">
       <DependentUpon>FormService.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TurnOnOffService\Service.cs" />
-    <Compile Include="TurnOnOffService\ServiceManager.cs" />
+    <Compile Include="OpenCloseService\Service.cs" />
+    <Compile Include="OpenCloseService\ServiceManager.cs" />
     <EmbeddedResource Include="ChangeFiles\FormChangeFile.resx">
       <DependentUpon>FormChangeFile.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TurnOnOffService\FormService.resx">
+    <EmbeddedResource Include="OpenCloseService\FormService.resx">
       <DependentUpon>FormService.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

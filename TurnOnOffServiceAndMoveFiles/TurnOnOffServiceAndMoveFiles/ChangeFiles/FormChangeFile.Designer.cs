@@ -1,4 +1,4 @@
-﻿namespace TurnOnOffService.ChangeFiles
+﻿namespace TurnOnOffServiceAndMoveFiles.ChangeFiles
 {
     partial class FormChangeFile
     {

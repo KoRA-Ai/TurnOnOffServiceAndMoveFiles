@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.34526.175
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurnOnOffService", "TurnOnOffService\TurnOnOffService.csproj", "{F7DA6339-2188-4FEF-A586-FC9664D5B84D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurnOnOffServiceAndMoveFiles", "TurnOnOffServiceAndMoveFiles\TurnOnOffServiceAndMoveFiles.csproj", "{F7DA6339-2188-4FEF-A586-FC9664D5B84D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

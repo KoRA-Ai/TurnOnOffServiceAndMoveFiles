@@ -1,4 +1,4 @@
-﻿namespace TurnOnOffService
+﻿namespace TurnOnOffServiceAndMoveFiles
 {
     partial class FormMain
     {

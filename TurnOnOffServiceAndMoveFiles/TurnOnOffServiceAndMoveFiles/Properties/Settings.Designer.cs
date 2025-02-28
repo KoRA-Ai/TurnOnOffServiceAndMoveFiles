@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TurnOnOffService.Properties
+namespace TurnOnOffServiceAndMoveFiles.Properties
 {
 
 

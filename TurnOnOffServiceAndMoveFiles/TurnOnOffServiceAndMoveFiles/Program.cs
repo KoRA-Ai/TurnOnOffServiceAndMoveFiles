@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using TurnOnOffService.ChangeFiles;
+using TurnOnOffServiceAndMoveFiles.ChangeFiles;
 
-namespace TurnOnOffService
+namespace TurnOnOffServiceAndMoveFiles
 {
     internal static class Program
     {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.ServiceProcess;
 using System.Windows.Forms;
 
-namespace TurnOnOffService
+namespace OpenCloseService
 {
     internal class ServiceManager
     {
