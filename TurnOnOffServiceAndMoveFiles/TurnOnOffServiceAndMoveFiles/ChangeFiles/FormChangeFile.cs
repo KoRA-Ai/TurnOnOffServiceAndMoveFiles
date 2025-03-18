@@ -68,6 +68,8 @@ namespace TurnOnOffServiceAndMoveFiles.ChangeFiles
                     int fileCount = 0;
                     MoveFile(from, to, ref fileCount);
                     tbLog.AppendText($"【換檔案完成-移動了{fileCount}個檔案】" + "\n");
+                    //打開目標資料夾
+                    System.Diagnostics.Process.Start(to);
                 }
             }
             catch (Exception e)
